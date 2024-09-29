@@ -11,6 +11,7 @@ import {
   ListItem,
   ListItemText,
   Container,
+  Chip,
 } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { getQuestionById, deleteQuestion } from '../../services/api';
@@ -123,6 +124,14 @@ const QuestionDetail: React.FC = () => {
                 </ListItem>
               ))}
             </List>
+            <Typography variant="h6" gutterBottom>
+              Keywords:
+            </Typography>
+            <Box display="flex" flexWrap="wrap" gap={2}>
+              {question.keywords.map((keyword, index) => (
+                <Chip key={index} label={keyword} sx={{ fontSize: '1.2rem' }} />
+              ))}
+            </Box>
             <Box display="flex" justifyContent="space-between" mt={2}>
               <Button
                 variant="contained"

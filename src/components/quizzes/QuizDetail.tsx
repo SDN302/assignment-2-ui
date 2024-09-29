@@ -97,45 +97,49 @@ const QuizDetail: React.FC = () => {
             <Typography variant="h6" gutterBottom>
               Questions:
             </Typography>
-            <List>
-              {quiz.questions.map((question) => (
-                <Accordion key={question._id}>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography variant="h6">{question.text}</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <List>
-                      {question.options.map((option, index) => (
-                        <ListItem
-                          key={index}
-                          sx={{
-                            pl: 4,
-                            backgroundColor:
-                              index === question.correctAnswerIndex
-                                ? "lightgreen"
-                                : "inherit",
-                          }}
-                        >
-                          <ListItemText
-                            primary={option}
-                            primaryTypographyProps={{
-                              color:
+            {quiz.questions.length === 0 ? (
+              <Typography variant="body1">No questions available</Typography>
+            ) : (
+              <List>
+                {quiz.questions.map((question) => (
+                  <Accordion key={question._id}>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography variant="h6">{question.text}</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <List>
+                        {question.options.map((option, index) => (
+                          <ListItem
+                            key={index}
+                            sx={{
+                              pl: 4,
+                              backgroundColor:
                                 index === question.correctAnswerIndex
-                                  ? "success"
-                                  : "textPrimary",
-                              fontWeight:
-                                index === question.correctAnswerIndex
-                                  ? "bold"
-                                  : "normal",
+                                  ? "lightgreen"
+                                  : "inherit",
                             }}
-                          />
-                        </ListItem>
-                      ))}
-                    </List>
-                  </AccordionDetails>
-                </Accordion>
-              ))}
-            </List>
+                          >
+                            <ListItemText
+                              primary={option}
+                              primaryTypographyProps={{
+                                color:
+                                  index === question.correctAnswerIndex
+                                    ? "success"
+                                    : "textPrimary",
+                                fontWeight:
+                                  index === question.correctAnswerIndex
+                                    ? "bold"
+                                    : "normal",
+                              }}
+                            />
+                          </ListItem>
+                        ))}
+                      </List>
+                    </AccordionDetails>
+                  </Accordion>
+                ))}
+              </List>
+            )}
             <Box display="flex" justifyContent="space-between" mt={2}>
               <Button
                 variant="contained"

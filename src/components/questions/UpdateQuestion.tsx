@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { Container, TextField, Button, Box, Typography, Select, MenuItem, FormControl, InputLabel, Alert } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { postQuestion } from "../../services/api";
+import { getQuestionById, putQuestion } from "../../services/api";
 import IQuestion from "../../models/Question";
 
 const theme = createTheme({
@@ -27,35 +27,48 @@ const theme = createTheme({
   },
 });
 
-const CreateQuestion: React.FC = () => {
+const UpdateQuestion: React.FC = () => {
+  const { questionID } = useParams<{ questionID: string }>();
+  const navigate = useNavigate();
+  const [question, setQuestion] = useState<IQuestion | null>(null);
   const [text, setText] = useState<string>("");
   const [options, setOptions] = useState<string[]>(["", "", "", ""]);
   const [keywords, setKeywords] = useState<string[]>([""]);
   const [correctAnswerIndex, setCorrectAnswerIndex] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const navigate = useNavigate();
 
-  const handleSubmit = async () => {
-    const newQuestion = {
-      text,
-      options,
-      correctAnswerIndex,
-      keywords,
+  useEffect(() => {
+    const fetchQuestion = async () => {
+      if (questionID) {
+        try {
+          const fetchedQuestion = await getQuestionById(questionID);
+          setQuestion(fetchedQuestion);
+          setText(fetchedQuestion.text);
+          setOptions(fetchedQuestion.options);
+          setKeywords(fetchedQuestion.keywords);
+          setCorrectAnswerIndex(fetchedQuestion.correctAnswerIndex);
+        } catch {
+          setError("Failed to fetch question data");
+        }
+      }
     };
-    try {
-      await postQuestion(newQuestion as IQuestion);
-      setText("");
-      setOptions(["", "", "", ""]);
-      setKeywords([""]);
-      setCorrectAnswerIndex(0);
-      setError(null);
-      setSuccessMessage("Question created successfully");
-      setTimeout(() => {
-        navigate("/questions");
-      }, 3000);
-    } catch (err) {
-      setError((err as Error).message);
+    fetchQuestion();
+  }, [questionID]);
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (questionID && question) {
+      try {
+        const updatedQuestion: IQuestion = { ...question, text, options, keywords, correctAnswerIndex };
+        await putQuestion(questionID, updatedQuestion);
+        setSuccessMessage("Question updated successfully");
+        setTimeout(() => {
+          navigate(`/questions/${questionID}`);
+        }, 3000);
+      } catch {
+        setError("Failed to update question");
+      }
     }
   };
 
@@ -88,7 +101,7 @@ const CreateQuestion: React.FC = () => {
           gutterBottom
           style={{ textAlign: "center", margin: "20px 0", fontWeight: "bold" }}
         >
-          Create Question
+          Update Question
         </Typography>
         {successMessage && (
           <Alert severity="success" style={{ marginBottom: "20px", fontSize:"20px" }}>
@@ -154,7 +167,7 @@ const CreateQuestion: React.FC = () => {
                 color="success"
                 onClick={handleSubmit}
               >
-                Create Question
+                Update Question
               </Button>
             </Box>
           </Box>
@@ -164,4 +177,4 @@ const CreateQuestion: React.FC = () => {
   );
 };
 
-export default CreateQuestion;
+export default UpdateQuestion;

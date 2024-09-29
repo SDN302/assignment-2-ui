@@ -69,7 +69,7 @@ const QuizList: React.FC = () => {
   const handleDelete = async (quizID: string) => {
     try {
       await deleteQuiz(quizID);
-      navigate('/');
+      setQuizzes((prevQuizzes) => prevQuizzes.filter((quiz) => quiz._id !== quizID));
     } catch (err) {
       setError((err as Error).message);
     }
@@ -103,7 +103,7 @@ const QuizList: React.FC = () => {
         <Box display="flex" justifyContent="flex-end" mb={2}>
           <Button
             variant="contained"
-            color="primary"
+            color="success"
             onClick={() => navigate("/create-quiz")}
           >
             Create Quiz

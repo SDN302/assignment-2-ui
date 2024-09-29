@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { TextField, Button, Container, Typography, Box, Alert } from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { postQuiz } from "../../services/api";
-import IQuiz from "../../models/Quiz";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { TextField, Button, Container, Typography, Box, Alert } from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import IQuiz from '../../models/Quiz';
+import { getQuizById, putQuiz } from '../../services/api';
 
 const theme = createTheme({
   palette: {
@@ -27,30 +27,43 @@ const theme = createTheme({
   },
 });
 
-const CreateQuiz: React.FC = () => {
-  const [title, setTitle] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
+const UpdateQuiz: React.FC = () => {
+  const { quizID } = useParams<{ quizID: string }>();
+  const navigate = useNavigate();
+  const [quiz, setQuiz] = useState<IQuiz | null>(null);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchQuiz = async () => {
+      if (quizID) {
+        try {
+          const fetchedQuiz = await getQuizById(quizID);
+          setQuiz(fetchedQuiz);
+          setTitle(fetchedQuiz.title);
+          setDescription(fetchedQuiz.description);
+        } catch {
+          setError('Failed to fetch quiz data');
+        }
+      }
+    };
+    fetchQuiz();
+  }, [quizID]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const quiz = { title, description };
-    try {
-      await postQuiz(quiz as IQuiz);
-      setTitle("");
-      setDescription("");
-      setError(null);
-      setSuccessMessage("Quiz created successfully");
-      setTimeout(() => {
-        navigate("/quizzes");
-      }, 3000);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unexpected error occurred");
+    if (quizID && quiz) {
+      try {
+        const updatedQuiz: IQuiz = { ...quiz, title, description };
+        await putQuiz(quizID, updatedQuiz);
+        setSuccessMessage("Quiz updated successfully");
+        setTimeout(() => {
+          navigate(`/quizzes/${quizID}`);
+        }, 3000);
+      } catch {
+        setError('Failed to update quiz');
       }
     }
   };
@@ -70,14 +83,13 @@ const CreateQuiz: React.FC = () => {
           gutterBottom
           style={{ textAlign: "center", margin: "20px 0" }}
         >
-          Create Quiz
+          Update Quiz
         </Typography>
         {successMessage && (
           <Alert severity="success" style={{ marginBottom: "20px", fontSize:"20px" }}>
             {successMessage}
           </Alert>
         )}
-
         <form onSubmit={handleSubmit}>
           <TextField
             label="Title"
@@ -102,8 +114,8 @@ const CreateQuiz: React.FC = () => {
             >
               Back
             </Button>
-            <Button type="submit" variant="contained" color="success">
-              Create Quiz
+            <Button type="submit" variant="contained" color="warning">
+              Update Quiz
             </Button>
           </Box>
         </form>
@@ -112,4 +124,4 @@ const CreateQuiz: React.FC = () => {
   );
 };
 
-export default CreateQuiz;
+export default UpdateQuiz;
