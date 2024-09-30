@@ -2,7 +2,7 @@ import axios from "axios";
 import IQuiz from "../models/Quiz";
 import IQuestion from "../models/Question";
 
-const API_BASE_URL = "https://sdn302-assignment-1.onrender.com/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const getQuizzes = async () => {
   const response = await axios.get(`${API_BASE_URL}/quizzes`);
