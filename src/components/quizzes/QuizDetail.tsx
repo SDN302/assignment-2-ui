@@ -14,6 +14,8 @@ import {
   AccordionSummary,
   AccordionDetails,
   Container,
+  TextField,
+  Chip,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -47,6 +49,8 @@ const QuizDetail: React.FC = () => {
   const [quiz, setQuiz] = useState<IQuiz | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [keyword, setKeyword] = useState<string>("");
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -65,9 +69,17 @@ const QuizDetail: React.FC = () => {
     }
   };
 
+  const handleSearch = () => {
+    setSearchKeyword(keyword);
+  };
+
   if (loading) return <CircularProgress />;
   if (error) return <div>{error}</div>;
   if (!quiz) return <div>No quiz found</div>;
+
+  const filteredQuestions = quiz.questions.filter((question) =>
+    question.text.toLowerCase().includes(searchKeyword.toLowerCase())
+  );
 
   return (
     <ThemeProvider theme={theme}>
@@ -86,6 +98,19 @@ const QuizDetail: React.FC = () => {
         >
           Quiz Details
         </Typography>
+        <Box display="flex" mb={2}>
+          <TextField
+            label="Search Questions"
+            variant="outlined"
+            fullWidth
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            style={{ marginRight: "10px" }}
+          />
+          <Button variant="contained" color="primary" onClick={handleSearch}>
+            Search
+          </Button>
+        </Box>
         <Card>
           <CardContent>
             <Typography variant="h4" gutterBottom>
@@ -97,11 +122,11 @@ const QuizDetail: React.FC = () => {
             <Typography variant="h6" gutterBottom>
               Questions:
             </Typography>
-            {quiz.questions.length === 0 ? (
+            {filteredQuestions.length === 0 ? (
               <Typography variant="body1">No questions available</Typography>
             ) : (
               <List>
-                {quiz.questions.map((question) => (
+                {filteredQuestions.map((question) => (
                   <Accordion key={question._id}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                       <Typography variant="h6">{question.text}</Typography>
@@ -135,6 +160,14 @@ const QuizDetail: React.FC = () => {
                           </ListItem>
                         ))}
                       </List>
+                      <Typography variant="h6" gutterBottom>
+                        Keywords:
+                      </Typography>
+                      <Box display="flex" flexWrap="wrap" gap={2}>
+                        {question.keywords.map((keyword, index) => (
+                          <Chip key={index} label={keyword} sx={{ fontSize: '1.2rem' }} />
+                        ))}
+                      </Box>
                     </AccordionDetails>
                   </Accordion>
                 ))}

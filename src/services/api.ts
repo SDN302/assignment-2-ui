@@ -14,9 +14,9 @@ export const getQuizById = async (quizID: string) => {
   return response.data;
 };
 
-export const getQuestionsInQuiz = async (quizID: string) => {
+export const getQuestionsInQuiz = async (quizID: string, keyword: string) => {
   const response = await axios.get(
-    `${API_BASE_URL}/quizzes/${quizID}/populate`
+    `${API_BASE_URL}/quizzes/${quizID}/populate/${keyword}`
   );
   return response.data;
 };
