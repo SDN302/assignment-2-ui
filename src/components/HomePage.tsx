@@ -15,7 +15,7 @@ const HomePage: React.FC = () => {
       p={4}
     >
       <Typography variant="h2" gutterBottom color="primary" fontWeight="bold">
-        Welcome to the Quiz App
+        Welcome to the Quizzes App
       </Typography>
       <Typography variant="h5" gutterBottom color="textSecondary">
         Test your knowledge with our quizzes!

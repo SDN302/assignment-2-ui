@@ -193,6 +193,14 @@ const QuizDetail: React.FC = () => {
                 <Button variant="contained" color="error" onClick={handleDelete}>
                   Delete
                 </Button>
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => navigate(`/quizzes/${quizID}/add-questions`)}
+                  sx={{ ml: 1 }}
+                >
+                  Add Questions
+                </Button>
               </Box>
             </Box>
           </CardContent>
