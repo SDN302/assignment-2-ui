@@ -63,7 +63,7 @@ const QuizDetail: React.FC = () => {
   const handleDelete = async () => {
     try {
       await deleteQuiz(quizID!);
-      navigate("/");
+      navigate("/quizzes");
     } catch (err) {
       setError((err as Error).message);
     }
