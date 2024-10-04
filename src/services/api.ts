@@ -41,11 +41,16 @@ export const postManyQuestionsInQuiz = async (
   quizID: string,
   questions: IQuestion[]
 ) => {
-  const response = await axios.post(
-    `${API_BASE_URL}/quizzes/${quizID}/questions`,
-    questions
-  );
-  return response.data;
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/quizzes/${quizID}/questions`,
+      [...questions]
+    );
+    return response.data;
+  } catch (error) {
+    console.error("API error:", error);
+    throw error;
+  }
 };
 
 export const putQuiz = async (quizID: string, quiz: IQuiz) => {
