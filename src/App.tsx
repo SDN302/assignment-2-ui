@@ -2,6 +2,8 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Container } from '@mui/material';
 import HomePage from './components/HomePage';
+import Header from './components/commons/Header';
+import Footer from './components/commons/Footer';
 
 const QuizList = lazy(() => import('./components/quizzes/QuizList'));
 const QuizDetail = lazy(() => import('./components/quizzes/QuizDetail'));
@@ -15,7 +17,8 @@ const UpdateQuestion = lazy(() => import('./components/questions/UpdateQuestion'
 const App: React.FC = () => {
   return (
     <Router>
-      <Container>
+      <Container maxWidth={false}>
+        <Header />
         <Suspense fallback={<div>Loading...</div>}>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -29,6 +32,7 @@ const App: React.FC = () => {
             <Route path="/update-question/:questionID" element={<UpdateQuestion />} />
           </Routes>
         </Suspense>
+        <Footer />
       </Container>
     </Router>
   );
