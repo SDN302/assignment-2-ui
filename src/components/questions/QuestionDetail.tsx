@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -12,10 +12,10 @@ import {
   ListItemText,
   Container,
   Chip,
-} from '@mui/material';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { getQuestionById, deleteQuestion } from '../../services/api';
-import IQuestion from '../../models/Question';
+} from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { getQuestionById, deleteQuestion } from "../../services/api";
+import IQuestion from "../../models/Question";
 
 const theme = createTheme({
   palette: {
@@ -36,7 +36,7 @@ const theme = createTheme({
       fontSize: "1.2rem",
       color: "#555",
     },
-  }
+  },
 });
 
 const QuestionDetail: React.FC = () => {
@@ -129,7 +129,13 @@ const QuestionDetail: React.FC = () => {
             </Typography>
             <Box display="flex" flexWrap="wrap" gap={2}>
               {question.keywords.map((keyword, index) => (
-                <Chip key={index} label={keyword} sx={{ fontSize: '1.2rem' }} />
+                <Chip
+                  variant="filled"
+                  color="secondary"
+                  key={index}
+                  label={keyword}
+                  sx={{ fontSize: "1.2rem" }}
+                />
               ))}
             </Box>
             <Box display="flex" justifyContent="space-between" mt={2}>
@@ -149,7 +155,11 @@ const QuestionDetail: React.FC = () => {
                 >
                   Update
                 </Button>
-                <Button variant="contained" color="error" onClick={handleDelete}>
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={handleDelete}
+                >
                   Delete
                 </Button>
               </Box>
