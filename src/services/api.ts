@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import IQuiz from "../models/Quiz";
 import IQuestion from "../models/Question";
 
@@ -41,14 +41,34 @@ export const postManyQuestionsInQuiz = async (
   quizID: string,
   questions: IQuestion[]
 ) => {
+  // Remove the _id property from each question
+  const sanitizedQuestions = questions.map(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    ({ _id, ...rest }) => rest
+  );
+
   try {
     const response = await axios.post(
       `${API_BASE_URL}/quizzes/${quizID}/questions`,
-      [...questions]
+      sanitizedQuestions
     );
-    return response.data;
+    return response;
   } catch (error) {
-    console.error("API error:", error);
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+
+      if (axiosError.response) {
+        console.error("API error:", axiosError.response.data);
+        console.error("Status:", axiosError.response.status);
+      } else if (axiosError.request) {
+        console.error("API error: No response received:", axiosError.request);
+      } else {
+        console.error("Error setting up request:", axiosError.message);
+      }
+    } else {
+      console.error("Unexpected error:", error);
+    }
+
     throw error;
   }
 };

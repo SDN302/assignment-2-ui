@@ -41,7 +41,7 @@ const theme = createTheme({
       fontSize: "1.2rem",
       color: "#555",
     },
-  }
+  },
 });
 
 const QuizDetail: React.FC = () => {
@@ -165,7 +165,13 @@ const QuizDetail: React.FC = () => {
                       </Typography>
                       <Box display="flex" flexWrap="wrap" gap={2}>
                         {question.keywords.map((keyword, index) => (
-                          <Chip key={index} label={keyword} sx={{ fontSize: '1.2rem' }} />
+                          <Chip
+                            variant="filled"
+                            color="secondary"
+                            key={index}
+                            label={keyword}
+                            sx={{ fontSize: "1.2rem" }}
+                          />
                         ))}
                       </Box>
                     </AccordionDetails>
@@ -190,7 +196,11 @@ const QuizDetail: React.FC = () => {
                 >
                   Update
                 </Button>
-                <Button variant="contained" color="error" onClick={handleDelete}>
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={handleDelete}
+                >
                   Delete
                 </Button>
                 <Button

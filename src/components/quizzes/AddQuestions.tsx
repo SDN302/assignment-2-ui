@@ -101,21 +101,25 @@ const AddQuestions: React.FC = () => {
   const handleSubmit = async () => {
     try {
       console.log("Submitting questions:", questions);
-      await postManyQuestionsInQuiz(quizID!, questions);
-      setQuestions([
-        {
-          _id: "",
-          text: "",
-          options: ["", "", "", ""],
-          correctAnswerIndex: 0,
-          keywords: [],
-        },
-      ]);
-      setError(null);
-      setSuccessMessage("Questions added successfully");
-      setTimeout(() => {
-        navigate(`/quizzes/${quizID}`);
-      }, 3000);
+      const response = await postManyQuestionsInQuiz(quizID!, questions);
+      if (response.status === 201) {
+        setQuestions([
+          {
+            _id: "",
+            text: "",
+            options: ["", "", "", ""],
+            correctAnswerIndex: 0,
+            keywords: [],
+          },
+        ]);
+        setError(null);
+        setSuccessMessage("Questions added successfully");
+        setTimeout(() => {
+          navigate(`/quizzes/${quizID}`);
+        }, 3000);
+      } else {
+        throw new Error(`Unexpected response status: ${response.status}`);
+      }
     } catch (err) {
       console.error("Error submitting questions:", err);
       setError((err as Error).message);
