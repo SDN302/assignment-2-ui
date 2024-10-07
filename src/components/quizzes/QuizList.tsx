@@ -1,52 +1,7 @@
 import React, { useEffect, useState } from "react";
-import {
-  Card,
-  CardContent,
-  Typography,
-  CircularProgress,
-  Grid,
-  Container,
-  Button,
-  Box,
-} from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import IQuiz from "../../models/Quiz";
 import { deleteQuiz, getQuizzes } from "../../services/api";
-
-const theme = createTheme({
-  palette: {
-    background: {
-      default: "#f4f6f8",
-    },
-  },
-  typography: {
-    h3: {
-      fontSize: "2rem",
-      fontWeight: "bold",
-    },
-    h5: {
-      fontSize: "1.5rem",
-      fontWeight: "bold",
-    },
-    h6: {
-      fontSize: "1.2rem",
-      color: "#555",
-    },
-  },
-  components: {
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          transition: "transform 0.3s",
-          "&:hover": {
-            transform: "scale(1.05)",
-          },
-        },
-      },
-    },
-  },
-});
 
 const QuizList: React.FC = () => {
   const [quizzes, setQuizzes] = useState<IQuiz[]>([]);
@@ -69,89 +24,78 @@ const QuizList: React.FC = () => {
   const handleDelete = async (quizID: string) => {
     try {
       await deleteQuiz(quizID);
-      setQuizzes((prevQuizzes) => prevQuizzes.filter((quiz) => quiz._id !== quizID));
+      setQuizzes((prevQuizzes) =>
+        prevQuizzes.filter((quiz) => quiz._id !== quizID)
+      );
     } catch (err) {
       setError((err as Error).message);
     }
   };
 
   if (loading) {
-    return <CircularProgress />;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <span className="loader"></span>
+      </div>
+    ); // Placeholder for CircularProgress
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return <div className="text-red-500 text-center">{error}</div>;
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      <Container
-        style={{
-          backgroundColor: "#fff",
-          padding: "20px",
-          borderRadius: "8px",
-          boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-        }}
-      >
-        <Typography
-          variant="h3"
-          gutterBottom
-          style={{ textAlign: "center", margin: "20px 0" }}
+    <div className="bg-white p-5 rounded-lg shadow-lg">
+      <h3 className="text-2xl font-bold text-center mb-5">Quizzes List</h3>
+      <div className="flex justify-end mb-4">
+        <button
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          onClick={() => navigate("/create-quiz")}
         >
-          Quizzes List
-        </Typography>
-        <Box display="flex" justifyContent="flex-end" mb={2}>
-          <Button
-            variant="contained"
-            color="success"
-            onClick={() => navigate("/create-quiz")}
+          Create Quiz
+        </button>
+      </div>
+      <div className="space-y-3 mx-4">
+        {quizzes.map((quiz) => (
+          <div
+            key={quiz._id}
+            className="border rounded-lg p-4 transition-transform hover:scale-105"
           >
-            Create Quiz
-          </Button>
-        </Box>
-        <Grid container direction="column" spacing={3}>
-          {quizzes.map((quiz) => (
-            <Grid item key={quiz._id}>
-              <Card style={{ margin: "15px 0", padding: "10px" }}>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <CardContent
-                    onClick={() => navigate(`/quizzes/${quiz._id}`)}
-                    style={{ cursor: "pointer", flexGrow: 1 }}
-                  >
-                    <Typography variant="h5" gutterBottom>
-                      {quiz.title}
-                    </Typography>
-                    <Typography variant="h6">{quiz.description}</Typography>
-                  </CardContent>
-                  <Box display="flex" justifyContent="flex-end" ml={2}>
-                    <Button
-                      variant="contained"
-                      color="warning"
-                      onClick={() => navigate(`/update-quiz/${quiz._id}`)}
-                      style={{ marginRight: "10px" }}
-                    >
-                      Update
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="error"
-                      onClick={() => handleDelete(quiz._id)}
-                    >
-                      Delete
-                    </Button>
-                  </Box>
-                </Box>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-        <Box display="flex" justifyContent="flex-start" mt={2}>
-          <Button variant="contained" color="info" onClick={() => navigate("/")}>
-            Back
-          </Button>
-        </Box>
-      </Container>
-    </ThemeProvider>
+            <div className="flex justify-between items-center">
+              <div
+                onClick={() => navigate(`/quizzes/${quiz._id}`)}
+                className="cursor-pointer flex-grow"
+              >
+                <h5 className="text-xl font-bold">{quiz.title}</h5>
+                <h6 className="text-gray-600">{quiz.description}</h6>
+              </div>
+              <div className="flex ml-2">
+                <button
+                  className="bg-yellow-500 text-white px-3 py-1 rounded mr-2 hover:bg-yellow-600"
+                  onClick={() => navigate(`/update-quiz/${quiz._id}`)}
+                >
+                  Update
+                </button>
+                <button
+                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                  onClick={() => handleDelete(quiz._id)}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-start mt-4">
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          onClick={() => navigate("/")}
+        >
+          Back
+        </button>
+      </div>
+    </div>
   );
 };
 

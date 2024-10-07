@@ -1,48 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  Card,
-  CardContent,
-  Typography,
-  CircularProgress,
-  Button,
-  Box,
-  List,
-  ListItem,
-  ListItemText,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Container,
-  TextField,
-  Chip,
-} from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { getQuizById, deleteQuiz } from "../../services/api";
+import { getQuizById, deleteQuiz, getQuestionById } from "../../services/api";
 import IQuiz from "../../models/Quiz";
-
-const theme = createTheme({
-  palette: {
-    background: {
-      default: "#f4f6f8",
-    },
-  },
-  typography: {
-    h3: {
-      fontSize: "2rem",
-      fontWeight: "bold",
-    },
-    h5: {
-      fontSize: "1.5rem",
-      fontWeight: "bold",
-    },
-    h6: {
-      fontSize: "1.2rem",
-      color: "#555",
-    },
-  },
-});
+import IQuestion from "../../models/Question";
 
 const QuizDetail: React.FC = () => {
   const { quizID } = useParams<{ quizID: string }>();
@@ -51,13 +11,24 @@ const QuizDetail: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [keyword, setKeyword] = useState<string>("");
   const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const [questions, setQuestions] = useState<IQuestion[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     getQuizById(quizID!)
       .then(setQuiz)
       .catch((err) => setError((err as Error).message))
-      .finally(() => setLoading(false));
+      .finally(async () => {
+        setLoading(false);
+
+        const questionsPromises = quiz!.questions.map(async (question) => {
+          const res = await getQuestionById(question);
+          return res;
+        });
+
+        const questions = await Promise.all(questionsPromises);
+        setQuestions(questions);
+      });
   }, [quizID]);
 
   const handleDelete = async () => {
@@ -73,150 +44,114 @@ const QuizDetail: React.FC = () => {
     setSearchKeyword(keyword);
   };
 
-  if (loading) return <CircularProgress />;
+  if (loading)
+    return (
+      <div className="flex justify-center">
+        <div className="loader"></div>
+      </div>
+    ); // You can replace this with a spinner component
   if (error) return <div>{error}</div>;
   if (!quiz) return <div>No quiz found</div>;
 
-  const filteredQuestions = quiz.questions.filter((question) =>
+  const filteredQuestions = questions.filter((question) =>
     question.text.toLowerCase().includes(searchKeyword.toLowerCase())
   );
 
   return (
-    <ThemeProvider theme={theme}>
-      <Container
-        style={{
-          backgroundColor: "#fff",
-          padding: "20px",
-          borderRadius: "8px",
-          boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-        }}
-      >
-        <Typography
-          variant="h3"
-          gutterBottom
-          style={{ textAlign: "center", margin: "20px 0" }}
+    <div className="bg-white p-6 rounded-lg shadow-lg">
+      <h2 className="text-3xl font-bold text-center mb-6">Quiz Details</h2>
+      <div className="flex mb-4">
+        <input
+          type="text"
+          placeholder="Search Questions"
+          className="border border-gray-300 rounded-lg p-2 flex-grow mr-2"
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+        />
+        <button
+          className="bg-blue-500 text-white p-2 rounded-lg"
+          onClick={handleSearch}
         >
-          Quiz Details
-        </Typography>
-        <Box display="flex" mb={2}>
-          <TextField
-            label="Search Questions"
-            variant="outlined"
-            fullWidth
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            style={{ marginRight: "10px" }}
-          />
-          <Button variant="contained" color="primary" onClick={handleSearch}>
-            Search
-          </Button>
-        </Box>
-        <Card>
-          <CardContent>
-            <Typography variant="h4" gutterBottom>
-              {quiz.title}
-            </Typography>
-            <Typography variant="h5" gutterBottom>
-              {quiz.description}
-            </Typography>
-            <Typography variant="h6" gutterBottom>
-              Questions:
-            </Typography>
-            {filteredQuestions.length === 0 ? (
-              <Typography variant="body1">No questions available</Typography>
-            ) : (
-              <List>
-                {filteredQuestions.map((question) => (
-                  <Accordion key={question._id}>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                      <Typography variant="h6">{question.text}</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <List>
-                        {question.options.map((option, index) => (
-                          <ListItem
-                            key={index}
-                            sx={{
-                              pl: 4,
-                              backgroundColor:
-                                index === question.correctAnswerIndex
-                                  ? "lightgreen"
-                                  : "inherit",
-                            }}
-                          >
-                            <ListItemText
-                              primary={option}
-                              primaryTypographyProps={{
-                                color:
-                                  index === question.correctAnswerIndex
-                                    ? "success"
-                                    : "textPrimary",
-                                fontWeight:
-                                  index === question.correctAnswerIndex
-                                    ? "bold"
-                                    : "normal",
-                              }}
-                            />
-                          </ListItem>
-                        ))}
-                      </List>
-                      <Typography variant="h6" gutterBottom>
-                        Keywords:
-                      </Typography>
-                      <Box display="flex" flexWrap="wrap" gap={2}>
-                        {question.keywords.map((keyword, index) => (
-                          <Chip
-                            variant="filled"
-                            color="secondary"
-                            key={index}
-                            label={keyword}
-                            sx={{ fontSize: "1.2rem" }}
-                          />
-                        ))}
-                      </Box>
-                    </AccordionDetails>
-                  </Accordion>
-                ))}
-              </List>
-            )}
-            <Box display="flex" justifyContent="space-between" mt={2}>
-              <Button
-                variant="contained"
-                color="info"
-                onClick={() => navigate("/quizzes")}
+          Search
+        </button>
+      </div>
+      <div className="mb-4">
+        <h3 className="text-2xl font-bold">{quiz.title}</h3>
+        <p className="text-lg mb-4">{quiz.description}</p>
+        <h4 className="text-lg font-semibold">Questions:</h4>
+        {filteredQuestions.length === 0 ? (
+          <p>No questions available</p>
+        ) : (
+          <div>
+            {filteredQuestions.map((question) => (
+              <details
+                key={question._id}
+                className="mb-4 border border-gray-300 rounded-lg p-4"
               >
-                Back
-              </Button>
-              <Box>
-                <Button
-                  variant="contained"
-                  color="warning"
-                  onClick={() => navigate(`/update-quiz/${quizID}`)}
-                  sx={{ mr: 1 }}
-                >
-                  Update
-                </Button>
-                <Button
-                  variant="contained"
-                  color="error"
-                  onClick={handleDelete}
-                >
-                  Delete
-                </Button>
-                <Button
-                  variant="contained"
-                  color="success"
-                  onClick={() => navigate(`/quizzes/${quizID}/add-questions`)}
-                  sx={{ ml: 1 }}
-                >
-                  Add Questions
-                </Button>
-              </Box>
-            </Box>
-          </CardContent>
-        </Card>
-      </Container>
-    </ThemeProvider>
+                <summary className="font-semibold cursor-pointer">
+                  {question.text}
+                </summary>
+                <div className="mt-2">
+                  <ul>
+                    {question.options.map((option, index) => (
+                      <li
+                        key={index}
+                        className={`p-2 ${
+                          index === question.correctAnswerIndex
+                            ? "bg-green-200"
+                            : ""
+                        }`}
+                      >
+                        {option}
+                      </li>
+                    ))}
+                  </ul>
+                  <h5 className="font-semibold mt-2">Keywords:</h5>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {question.keywords.map((keyword, index) => (
+                      <span
+                        key={index}
+                        className="bg-blue-200 text-blue-800 py-1 px-3 rounded-full text-sm"
+                      >
+                        {keyword}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </details>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="flex justify-between mt-4">
+        <button
+          className="bg-gray-300 p-2 rounded-lg"
+          onClick={() => navigate("/quizzes")}
+        >
+          Back
+        </button>
+        <div>
+          <button
+            className="bg-yellow-500 text-white p-2 rounded-lg mr-2"
+            onClick={() => navigate(`/update-quiz/${quizID}`)}
+          >
+            Update
+          </button>
+          <button
+            className="bg-red-500 text-white p-2 rounded-lg mr-2"
+            onClick={handleDelete}
+          >
+            Delete
+          </button>
+          <button
+            className="bg-green-500 text-white p-2 rounded-lg"
+            onClick={() => navigate(`/quizzes/${quizID}/add-questions`)}
+          >
+            Add Questions
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 

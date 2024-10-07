@@ -1,22 +1,21 @@
 import React from "react";
-import { AppBar, Toolbar, Button } from "@mui/material";
 import { Link } from "react-router-dom";
 
 const Header: React.FC = () => {
   return (
-    <AppBar position="fixed">
-      <Toolbar style={{ margin: "auto" }}>
-        <Button color="inherit" component={Link} to="/">
+    <header className="fixed w-full bg-blue-600 shadow">
+      <div className="flex justify-center space-x-4 py-4">
+        <Link to="/" className="text-white hover:text-gray-200">
           Home
-        </Button>
-        <Button color="inherit" component={Link} to="/quizzes">
+        </Link>
+        <Link to="/quizzes" className="text-white hover:text-gray-200">
           Quizzes
-        </Button>
-        <Button color="inherit" component={Link} to="/questions">
+        </Link>
+        <Link to="/questions" className="text-white hover:text-gray-200">
           Questions
-        </Button>
-      </Toolbar>
-    </AppBar>
+        </Link>
+      </div>
+    </header>
   );
 };
 

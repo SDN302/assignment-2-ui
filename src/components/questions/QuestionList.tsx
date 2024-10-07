@@ -1,52 +1,7 @@
 import React, { useEffect, useState } from "react";
-import {
-  Card,
-  CardContent,
-  Typography,
-  CircularProgress,
-  Container,
-  ThemeProvider,
-  createTheme,
-  Box,
-  Button,
-} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import IQuestion from "../../models/Question";
 import { deleteQuestion, getQuestions } from "../../services/api";
-
-const theme = createTheme({
-  palette: {
-    background: {
-      default: "#f4f6f8",
-    },
-  },
-  typography: {
-    h3: {
-      fontSize: "2rem",
-      fontWeight: "bold",
-    },
-    h5: {
-      fontSize: "1.5rem",
-      fontWeight: "bold",
-    },
-    h6: {
-      fontSize: "1.2rem",
-      color: "#555",
-    },
-  },
-  components: {
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          transition: "transform 0.3s",
-          "&:hover": {
-            transform: "scale(1.05)",
-          },
-        },
-      },
-    },
-  },
-});
 
 const QuestionList: React.FC = () => {
   const [questions, setQuestions] = useState<IQuestion[]>([]);
@@ -76,92 +31,70 @@ const QuestionList: React.FC = () => {
   };
 
   if (loading) {
-    return <CircularProgress />;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="loader"></div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return <div className="text-red-600">{error}</div>;
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      <Container
-        style={{
-          backgroundColor: "#fff",
-          padding: "20px",
-          borderRadius: "8px",
-          boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-        }}
-      >
-        <Typography
-          variant="h3"
-          gutterBottom
-          style={{ textAlign: "center", margin: "20px 0" }}
+    <div className="bg-white p-6 rounded-lg shadow-lg">
+      <h3 className="text-2xl font-bold text-center mb-6">Questions List</h3>
+      <div className="flex justify-end mb-4">
+        <button
+          className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition"
+          onClick={() => navigate("/create-question")}
         >
-          Questions List
-        </Typography>
-        <Box display="flex" justifyContent="flex-end" mb={2}>
-          <Button
-            variant="contained"
-            color="success"
-            onClick={() => navigate("/create-question")}
-          >
-            Create Question
-          </Button>
-        </Box>
-        {questions.map((question) => (
-          <Card
-            key={question._id}
-            style={{ margin: "20px 0", padding: "10px", cursor: "pointer" }}
-            onClick={() => navigate(`/questions/${question._id}`)}
-          >
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <CardContent style={{ flexGrow: 1 }}>
-                <Typography variant="h6" gutterBottom>
-                  {question.text}
-                </Typography>
-              </CardContent>
-              <Box display="flex" justifyContent="flex-end" ml={2}>
-                <Button
-                  variant="contained"
-                  color="warning"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/update-question/${question._id}`);
-                  }}
-                  style={{ marginRight: "10px" }}
-                >
-                  Update
-                </Button>
-                <Button
-                  variant="contained"
-                  color="error"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(question._id);
-                  }}
-                >
-                  Delete
-                </Button>
-              </Box>
-            </Box>
-          </Card>
-        ))}
-        <Box display="flex" justifyContent="flex-start" mt={2}>
-          <Button
-            variant="contained"
-            color="info"
-            onClick={() => navigate("/")}
-          >
-            Back
-          </Button>
-        </Box>
-      </Container>
-    </ThemeProvider>
+          Create Question
+        </button>
+      </div>
+      {questions.map((question) => (
+        <div
+          key={question._id}
+          className="mx-3 bg-gray-100 p-4 mb-4 rounded-lg cursor-pointer transition transform hover:scale-105"
+          onClick={() => navigate(`/questions/${question._id}`)}
+        >
+          <div className="flex justify-between items-center">
+            <div>
+              <h6 className="text-lg font-semibold">{question.text}</h6>
+            </div>
+            <div className="flex">
+              <button
+                className="bg-yellow-500 text-white py-1 px-3 rounded mr-2 hover:bg-yellow-600 transition"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/update-question/${question._id}`);
+                }}
+              >
+                Update
+              </button>
+              <button
+                className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 transition"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(question._id);
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+      <div className="flex justify-start mt-4">
+        <button
+          className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition"
+          onClick={() => navigate("/")}
+        >
+          Back
+        </button>
+      </div>
+    </div>
   );
 };
 

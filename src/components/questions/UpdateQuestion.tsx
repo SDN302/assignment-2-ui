@@ -1,31 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Container, TextField, Button, Box, Typography, Select, MenuItem, FormControl, InputLabel, Alert } from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { getQuestionById, putQuestion } from "../../services/api";
 import IQuestion from "../../models/Question";
-
-const theme = createTheme({
-  palette: {
-    background: {
-      default: "#f4f6f8",
-    },
-  },
-  typography: {
-    h3: {
-      fontSize: "2rem",
-      fontWeight: "bold",
-    },
-    h5: {
-      fontSize: "1.5rem",
-      fontWeight: "bold",
-    },
-    h6: {
-      fontSize: "1.2rem",
-      color: "#555",
-    },
-  },
-});
 
 const UpdateQuestion: React.FC = () => {
   const { questionID } = useParams<{ questionID: string }>();
@@ -60,7 +36,13 @@ const UpdateQuestion: React.FC = () => {
     event.preventDefault();
     if (questionID && question) {
       try {
-        const updatedQuestion: IQuestion = { ...question, text, options, keywords, correctAnswerIndex };
+        const updatedQuestion: IQuestion = {
+          ...question,
+          text,
+          options,
+          keywords,
+          correctAnswerIndex,
+        };
         await putQuestion(questionID, updatedQuestion);
         setSuccessMessage("Question updated successfully");
         setTimeout(() => {
@@ -87,93 +69,79 @@ const UpdateQuestion: React.FC = () => {
   const addKeywordField = () => setKeywords([...keywords, ""]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <Container
-        style={{
-          backgroundColor: "#fff",
-          padding: "20px",
-          borderRadius: "8px",
-          boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-        }}
-      >
-        <Typography
-          variant="h4"
-          gutterBottom
-          style={{ textAlign: "center", margin: "20px 0", fontWeight: "bold" }}
-        >
-          Update Question
-        </Typography>
+    <div className="flex flex-col items-center bg-gray-100 min-h-screen p-6">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+        <h1 className="text-2xl font-bold text-center mb-4">Update Question</h1>
         {successMessage && (
-          <Alert severity="success" style={{ marginBottom: "20px", fontSize:"20px" }}>
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
             {successMessage}
-          </Alert>
+          </div>
         )}
-        <Box display="flex" flexDirection="column" gap={2}>
-          <TextField
-            label="Question Text"
+        <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+          <input
+            type="text"
+            placeholder="Question Text"
             value={text}
             onChange={(e) => setText(e.target.value)}
-            fullWidth
+            className="border rounded p-2 w-full"
           />
           {options.map((option, index) => (
-            <TextField
+            <input
               key={index}
-              label={`Option ${index + 1}`}
+              type="text"
+              placeholder={`Option ${index + 1}`}
               value={option}
               onChange={(e) => handleOptionsChange(index, e.target.value)}
-              fullWidth
+              className="border rounded p-2 w-full"
             />
           ))}
           {keywords.map((keyword, index) => (
-            <TextField
+            <input
               key={index}
-              label={`Keyword ${index + 1}`}
+              type="text"
+              placeholder={`Keyword ${index + 1}`}
               value={keyword}
               onChange={(e) => handleKeywordsChange(index, e.target.value)}
-              fullWidth
+              className="border rounded p-2 w-full"
             />
           ))}
-          <Button variant="outlined" onClick={addKeywordField}>
+          <button
+            type="button"
+            onClick={addKeywordField}
+            className="text-blue-500"
+          >
             Add Keyword
-          </Button>
-          <FormControl fullWidth>
-            <InputLabel id="correct-answer-label">Correct Answer</InputLabel>
-            <Select
-              labelId="correct-answer-label"
-              value={correctAnswerIndex}
-              onChange={(e) => setCorrectAnswerIndex(Number(e.target.value))}
-              label="Correct Answer"
-            >
-              {options.map((option, index) => (
-                <MenuItem key={index} value={index}>
-                  {`Option ${index + 1}`}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          {error && <Typography color="error">{error}</Typography>}
-
-          <Box display="flex" justifyContent="space-between" mt={2}>
-            <Button
-              variant="contained"
-              color="info"
+          </button>
+          <select
+            value={correctAnswerIndex}
+            onChange={(e) => setCorrectAnswerIndex(Number(e.target.value))}
+            className="border rounded p-2 w-full"
+          >
+            {options.map((option, index) => (
+              <option key={index} value={index}>
+                {`Option ${index + 1}`}
+              </option>
+            ))}
+          </select>
+          {error && <div className="text-red-500">{error}</div>}
+          <div className="flex justify-between mt-4">
+            <button
+              type="button"
               onClick={() => navigate("/questions")}
+              className="bg-blue-500 text-white px-4 py-2 rounded"
             >
               Back
-            </Button>
-            <Box>
-              <Button
-                variant="contained"
-                color="success"
-                onClick={handleSubmit}
-              >
-                Update Question
-              </Button>
-            </Box>
-          </Box>
-        </Box>
-      </Container>
-    </ThemeProvider>
+            </button>
+            <button
+              type="submit"
+              className="bg-green-500 text-white px-4 py-2 rounded"
+            >
+              Update Question
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 

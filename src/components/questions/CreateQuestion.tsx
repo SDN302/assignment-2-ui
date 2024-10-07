@@ -1,31 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, TextField, Button, Box, Typography, Select, MenuItem, FormControl, InputLabel, Alert } from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { postQuestion } from "../../services/api";
 import IQuestion from "../../models/Question";
-
-const theme = createTheme({
-  palette: {
-    background: {
-      default: "#f4f6f8",
-    },
-  },
-  typography: {
-    h3: {
-      fontSize: "2rem",
-      fontWeight: "bold",
-    },
-    h5: {
-      fontSize: "1.5rem",
-      fontWeight: "bold",
-    },
-    h6: {
-      fontSize: "1.2rem",
-      color: "#555",
-    },
-  },
-});
 
 const CreateQuestion: React.FC = () => {
   const [text, setText] = useState<string>("");
@@ -74,93 +50,76 @@ const CreateQuestion: React.FC = () => {
   const addKeywordField = () => setKeywords([...keywords, ""]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <Container
-        style={{
-          backgroundColor: "#fff",
-          padding: "20px",
-          borderRadius: "8px",
-          boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-        }}
-      >
-        <Typography
-          variant="h4"
-          gutterBottom
-          style={{ textAlign: "center", margin: "20px 0", fontWeight: "bold" }}
-        >
-          Create Question
-        </Typography>
-        {successMessage && (
-          <Alert severity="success" style={{ marginBottom: "20px", fontSize:"20px" }}>
-            {successMessage}
-          </Alert>
-        )}
-        <Box display="flex" flexDirection="column" gap={2}>
-          <TextField
-            label="Question Text"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            fullWidth
+    <div className="container mx-auto p-6 bg-white rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold text-center mb-4">Create Question</h2>
+      {successMessage && (
+        <div className="mb-4 p-2 text-green-700 bg-green-200 rounded">
+          {successMessage}
+        </div>
+      )}
+      <div className="flex flex-col gap-4">
+        <input
+          type="text"
+          placeholder="Question Text"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          className="p-2 border border-gray-300 rounded"
+        />
+        {options.map((option, index) => (
+          <input
+            key={index}
+            type="text"
+            placeholder={`Option ${index + 1}`}
+            value={option}
+            onChange={(e) => handleOptionsChange(index, e.target.value)}
+            className="p-2 border border-gray-300 rounded"
           />
+        ))}
+        {keywords.map((keyword, index) => (
+          <input
+            key={index}
+            type="text"
+            placeholder={`Keyword ${index + 1}`}
+            value={keyword}
+            onChange={(e) => handleKeywordsChange(index, e.target.value)}
+            className="p-2 border border-gray-300 rounded"
+          />
+        ))}
+        <button
+          onClick={addKeywordField}
+          className="mt-2 p-2 border border-gray-300 rounded text-blue-600 hover:bg-blue-100"
+        >
+          Add Keyword
+        </button>
+        <select
+          value={correctAnswerIndex}
+          onChange={(e) => setCorrectAnswerIndex(Number(e.target.value))}
+          className="p-2 border border-gray-300 rounded"
+        >
           {options.map((option, index) => (
-            <TextField
-              key={index}
-              label={`Option ${index + 1}`}
-              value={option}
-              onChange={(e) => handleOptionsChange(index, e.target.value)}
-              fullWidth
-            />
+            <option key={index} value={index}>
+              {`Option ${index + 1}`}
+            </option>
           ))}
-          {keywords.map((keyword, index) => (
-            <TextField
-              key={index}
-              label={`Keyword ${index + 1}`}
-              value={keyword}
-              onChange={(e) => handleKeywordsChange(index, e.target.value)}
-              fullWidth
-            />
-          ))}
-          <Button variant="outlined" onClick={addKeywordField}>
-            Add Keyword
-          </Button>
-          <FormControl fullWidth>
-            <InputLabel id="correct-answer-label">Correct Answer</InputLabel>
-            <Select
-              labelId="correct-answer-label"
-              value={correctAnswerIndex}
-              onChange={(e) => setCorrectAnswerIndex(Number(e.target.value))}
-              label="Correct Answer"
-            >
-              {options.map((option, index) => (
-                <MenuItem key={index} value={index}>
-                  {`Option ${index + 1}`}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          {error && <Typography color="error">{error}</Typography>}
+        </select>
+        {error && <p className="text-red-600">{error}</p>}
 
-          <Box display="flex" justifyContent="space-between" mt={2}>
-            <Button
-              variant="contained"
-              color="info"
-              onClick={() => navigate("/questions")}
-            >
-              Back
-            </Button>
-            <Box>
-              <Button
-                variant="contained"
-                color="success"
-                onClick={handleSubmit}
-              >
-                Create Question
-              </Button>
-            </Box>
-          </Box>
-        </Box>
-      </Container>
-    </ThemeProvider>
+        <div className="flex justify-between mt-4">
+          <button
+            onClick={() => navigate("/questions")}
+            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          >
+            Back
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+          >
+            Create Question
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 

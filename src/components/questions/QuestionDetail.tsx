@@ -1,43 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  Card,
-  CardContent,
-  Typography,
-  CircularProgress,
-  Button,
-  Box,
-  List,
-  ListItem,
-  ListItemText,
-  Container,
-  Chip,
-} from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { getQuestionById, deleteQuestion } from "../../services/api";
 import IQuestion from "../../models/Question";
-
-const theme = createTheme({
-  palette: {
-    background: {
-      default: "#f4f6f8",
-    },
-  },
-  typography: {
-    h3: {
-      fontSize: "2rem",
-      fontWeight: "bold",
-    },
-    h5: {
-      fontSize: "1.5rem",
-      fontWeight: "bold",
-    },
-    h6: {
-      fontSize: "1.2rem",
-      color: "#555",
-    },
-  },
-});
 
 const QuestionDetail: React.FC = () => {
   const { questionID } = useParams<{ questionID: string }>();
@@ -67,107 +31,76 @@ const QuestionDetail: React.FC = () => {
     }
   };
 
-  if (loading) return <CircularProgress />;
-  if (error) return <div>{error}</div>;
-  if (!question) return <div>No question found</div>;
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-blue-500"></div>
+      </div>
+    );
+  if (error) return <div className="text-red-500 text-center">{error}</div>;
+  if (!question) return <div className="text-center">No question found</div>;
 
   return (
-    <ThemeProvider theme={theme}>
-      <Container
-        style={{
-          backgroundColor: "#fff",
-          padding: "20px",
-          borderRadius: "8px",
-          boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-        }}
-      >
-        <Typography
-          variant="h3"
-          gutterBottom
-          style={{ textAlign: "center", margin: "20px 0" }}
-        >
-          Question Details
-        </Typography>
-        <Card>
-          <CardContent>
-            <Typography variant="h4" gutterBottom>
-              {question.text}
-            </Typography>
-            <Typography variant="h6" gutterBottom>
-              Options:
-            </Typography>
-            <List>
-              {question.options.map((option, index) => (
-                <ListItem
-                  key={index}
-                  sx={{
-                    pl: 4,
-                    backgroundColor:
-                      index === question.correctAnswerIndex
-                        ? "lightgreen"
-                        : "inherit",
-                  }}
-                >
-                  <ListItemText
-                    primary={option}
-                    primaryTypographyProps={{
-                      color:
-                        index === question.correctAnswerIndex
-                          ? "success"
-                          : "textPrimary",
-                      fontWeight:
-                        index === question.correctAnswerIndex
-                          ? "bold"
-                          : "normal",
-                    }}
-                  />
-                </ListItem>
-              ))}
-            </List>
-            <Typography variant="h6" gutterBottom>
-              Keywords:
-            </Typography>
-            <Box display="flex" flexWrap="wrap" gap={2}>
-              {question.keywords.map((keyword, index) => (
-                <Chip
-                  variant="filled"
-                  color="secondary"
-                  key={index}
-                  label={keyword}
-                  sx={{ fontSize: "1.2rem" }}
-                />
-              ))}
-            </Box>
-            <Box display="flex" justifyContent="space-between" mt={2}>
-              <Button
-                variant="contained"
-                color="info"
-                onClick={() => navigate("/questions")}
+    <div className="container mx-auto p-6 bg-white rounded-lg shadow-md">
+      <h2 className="text-3xl font-bold text-center mb-4">Question Details</h2>
+      <div className="bg-white rounded-lg shadow p-4">
+        <h3 className="text-2xl font-semibold mb-2">{question.text}</h3>
+        <h4 className="text-xl font-semibold mb-2">Options:</h4>
+        <ul className="list-disc pl-5">
+          {question.options.map((option, index) => (
+            <li
+              key={index}
+              className={`p-2 ${
+                index === question.correctAnswerIndex
+                  ? "bg-green-200 font-bold"
+                  : "bg-white"
+              }`}
+            >
+              <span
+                className={`${
+                  index === question.correctAnswerIndex ? "text-green-700" : ""
+                }`}
               >
-                Back
-              </Button>
-              <Box>
-                <Button
-                  variant="contained"
-                  color="warning"
-                  onClick={() => navigate(`/update-question/${questionID}`)}
-                  sx={{ mr: 1 }}
-                >
-                  Update
-                </Button>
-                <Button
-                  variant="contained"
-                  color="error"
-                  onClick={handleDelete}
-                >
-                  Delete
-                </Button>
-              </Box>
-            </Box>
-          </CardContent>
-        </Card>
-      </Container>
-    </ThemeProvider>
+                {option}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <h4 className="text-xl font-semibold mt-4">Keywords:</h4>
+        <div className="flex flex-wrap gap-2 mt-2">
+          {question.keywords.map((keyword, index) => (
+            <span
+              key={index}
+              className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm"
+            >
+              {keyword}
+            </span>
+          ))}
+        </div>
+        <div className="flex justify-between mt-4">
+          <button
+            onClick={() => navigate("/questions")}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Back
+          </button>
+          <div>
+            <button
+              onClick={() => navigate(`/update-question/${questionID}`)}
+              className="mr-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+            >
+              Update
+            </button>
+            <button
+              onClick={handleDelete}
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -1,38 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { TextField, Button, Container, Typography, Box, Alert } from '@mui/material';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import IQuiz from '../../models/Quiz';
-import { getQuizById, putQuiz } from '../../services/api';
-
-const theme = createTheme({
-  palette: {
-    background: {
-      default: "#f4f6f8",
-    },
-  },
-  typography: {
-    h3: {
-      fontSize: "2rem",
-      fontWeight: "bold",
-    },
-    h5: {
-      fontSize: "1.5rem",
-      fontWeight: "bold",
-    },
-    h6: {
-      fontSize: "1.2rem",
-      color: "#555",
-    },
-  },
-});
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import IQuiz from "../../models/Quiz";
+import { getQuizById, putQuiz } from "../../services/api";
 
 const UpdateQuiz: React.FC = () => {
   const { quizID } = useParams<{ quizID: string }>();
   const navigate = useNavigate();
   const [quiz, setQuiz] = useState<IQuiz | null>(null);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -45,7 +21,7 @@ const UpdateQuiz: React.FC = () => {
           setTitle(fetchedQuiz.title);
           setDescription(fetchedQuiz.description);
         } catch {
-          setError('Failed to fetch quiz data');
+          setError("Failed to fetch quiz data");
         }
       }
     };
@@ -63,64 +39,65 @@ const UpdateQuiz: React.FC = () => {
           navigate(`/quizzes/${quizID}`);
         }, 3000);
       } catch {
-        setError('Failed to update quiz');
+        setError("Failed to update quiz");
       }
     }
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <Container
-        style={{
-          backgroundColor: "#fff",
-          padding: "20px",
-          borderRadius: "8px",
-          boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-        }}
-      >
-        <Typography
-          variant="h3"
-          gutterBottom
-          style={{ textAlign: "center", margin: "20px 0" }}
-        >
-          Update Quiz
-        </Typography>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+        <h3 className="text-2xl font-bold text-center mb-6">Update Quiz</h3>
         {successMessage && (
-          <Alert severity="success" style={{ marginBottom: "20px", fontSize:"20px" }}>
+          <div className="bg-green-200 text-green-800 p-2 rounded mb-4 text-center">
             {successMessage}
-          </Alert>
+          </div>
         )}
         <form onSubmit={handleSubmit}>
-          <TextField
-            label="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            fullWidth
-            margin="normal"
-          />
-          {error && <Typography color="error">{error}</Typography>}
-          <Box display="flex" justifyContent="space-between" mt={2}>
-            <Button
-              variant="contained"
-              color="info"
+          <div className="mb-4">
+            <label className="block text-gray-700" htmlFor="title">
+              Title
+            </label>
+            <input
+              id="title"
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full border border-gray-300 p-2 rounded"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700" htmlFor="description">
+              Description
+            </label>
+            <textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full border border-gray-300 p-2 rounded"
+              required
+            />
+          </div>
+          {error && <p className="text-red-600 mb-4">{error}</p>}
+          <div className="flex justify-between mt-6">
+            <button
+              type="button"
               onClick={() => navigate("/quizzes")}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
             >
               Back
-            </Button>
-            <Button type="submit" variant="contained" color="warning">
+            </button>
+            <button
+              type="submit"
+              className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
+            >
               Update Quiz
-            </Button>
-          </Box>
+            </button>
+          </div>
         </form>
-      </Container>
-    </ThemeProvider>
+      </div>
+    </div>
   );
 };
 

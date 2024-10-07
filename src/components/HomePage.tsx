@@ -1,44 +1,32 @@
-import React from 'react';
-import { Box, Typography, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
-      bgcolor="#f5f5f5"
-      p={4}
-    >
-      <Typography variant="h2" gutterBottom color="primary" fontWeight="bold">
+    <div className="flex flex-col items-center justify-center bg-gray-100 p-8 h-screen">
+      <h1 className="text-4xl font-bold text-blue-600 mb-4">
         Welcome to the Quizzes App
-      </Typography>
-      <Typography variant="h5" gutterBottom color="textSecondary">
+      </h1>
+      <h2 className="text-2xl text-gray-600 mb-8">
         Test your knowledge with our quizzes!
-      </Typography>
-      <Box mt={4} display="flex" gap={2}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => navigate('/quizzes')}
-          sx={{ fontSize: '1.2rem', padding: '10px 20px' }}
+      </h2>
+      <div className="mt-4 flex gap-4">
+        <button
+          className="bg-blue-600 text-white text-lg font-semibold py-2 px-4 rounded hover:bg-blue-700 transition"
+          onClick={() => navigate("/quizzes")}
         >
           View Quizzes List
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => navigate('/questions')}
-          sx={{ fontSize: '1.2rem', padding: '10px 20px' }}
+        </button>
+        <button
+          className="bg-blue-600 text-white text-lg font-semibold py-2 px-4 rounded hover:bg-blue-700 transition"
+          onClick={() => navigate("/questions")}
         >
           View Questions List
-        </Button>
-      </Box>
-    </Box>
+        </button>
+      </div>
+    </div>
   );
 };
 
